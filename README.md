@@ -23,4 +23,5 @@ Work in progress:
 - Disk scheduling
 - Multiprogramming
 
-- Paalis nalang nung return tass sabay add niyu yung logic sa baba nung return 
+## Paalis nalang nung return tass sabay add niyu yung logic sa baba nung return 
+- yung logic andun na sa flowgo 
