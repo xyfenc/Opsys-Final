@@ -4,9 +4,21 @@
 -parang ganto 
 
 
-'''powershell
-documentation
-            |--> photo/screenshot
-                 videoo
-                 
-'''
+```text
+documentation/
+│
+├── Category-1/
+│   ├── screenshots/
+│   │   ├── image1.png
+│   │   └── image2.png
+│   └── videos/
+│       └── video1.mp4
+│
+├── Category-2/
+│   ├── screenshots/
+│   └── videos/
+│
+└── Category-3/
+    ├── screenshots/
+    └── videos/
+```
