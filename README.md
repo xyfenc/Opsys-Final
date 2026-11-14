@@ -1,6 +1,4 @@
 # Opsys Final Project
-
-
 ## Run
 
 ```powershell
@@ -25,3 +23,4 @@ Work in progress:
 - Disk scheduling
 - Multiprogramming
 
+- Paalis nalang nung return tass sabay add niyu yung logic sa baba nung return 
