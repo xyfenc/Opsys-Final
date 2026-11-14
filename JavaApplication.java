@@ -85,7 +85,10 @@ public class JavaApplication extends JFrame {
             item.setHorizontalAlignment(SwingConstants.LEFT);
             item.setForeground(new Color(202, 211, 226));
             item.setBackground(DARK);
-            item.setBorderPainted(false);
+            item.setOpaque(true);
+            item.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(48, 58, 75)),
+                new EmptyBorder(10, 10, 10, 8)));
             item.setFocusPainted(false);
             item.addActionListener(e -> showModule(index));
             panel.add(item);
