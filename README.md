@@ -25,5 +25,5 @@ Work in progress:
 
 - Multiprogramming
 
-
+##ung logic nasa flowgo
 - yung logic andun na sa flowgo 
