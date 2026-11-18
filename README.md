@@ -16,6 +16,8 @@ Implemented:
 - Paging
 - Segmentation
 - Page replacement
+
+
 Work in progress:
 
 
