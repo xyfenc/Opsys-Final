@@ -4,8 +4,11 @@ public final class PageReplacement {
     private PageReplacement() {}
 
     public static String simulate(int algorithmChoice, int frameCount, int[] references) {
-        return "PAGE REPLACEMENT RESULT\n\nTODO: FIFO, LRU, and Optimal page replacement.";
-     for (int referenceIndex = 0; referenceIndex < references.length; referenceIndex++) {
+        int[] frames = new int[frameCount], lastUsedAt = new int[frameCount];
+        Arrays.fill(frames, -1); Arrays.fill(lastUsedAt, -1);
+        int fifoPointer = 0, hitCount = 0, faultCount = 0;
+        StringBuilder result = new StringBuilder("PAGE REPLACEMENT RESULT\n\nReference  Status  Frames\n");
+        for (int referenceIndex = 0; referenceIndex < references.length; referenceIndex++) {
             int page = references[referenceIndex], replacementFrame = -1;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) if (frames[frameIndex] == page) replacementFrame = frameIndex;
             String status = "HIT";
