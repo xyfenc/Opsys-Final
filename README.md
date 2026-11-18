@@ -16,14 +16,14 @@ Implemented:
 - Paging
 - Segmentation
 - Page replacement
-
+- Disk scheduling
 
 Work in progress:
 
 
 - Fragmentation
-- Disk scheduling
+
 - Multiprogramming
 
-## Paalis nalang nung return tass sabay add niyu yung logic sa baba nung return 
+
 - yung logic andun na sa flowgo 
