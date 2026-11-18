@@ -6,7 +6,6 @@ public final class DiskScheduling {
     private DiskScheduling() {}
 
     public static String simulate(int algorithmChoice, int directionChoice, int initialHeadPosition, int maximumCylinder, int[] requests) {
-        return "DISK SCHEDULING RESULT\n\nTODO: FCFS, SSTF, SCAN, and C-SCAN.";
         ArrayList<Integer> serviceOrder = new ArrayList<>(), pendingRequests = new ArrayList<>();
         for (int request : requests) pendingRequests.add(request);
         int currentHeadPosition = initialHeadPosition;
@@ -23,5 +22,6 @@ public final class DiskScheduling {
         }
         int totalMovement = 0; currentHeadPosition = initialHeadPosition;
         for (int cylinder : serviceOrder) { totalMovement += Math.abs(cylinder - currentHeadPosition); currentHeadPosition = cylinder; }
+        return "DISK SCHEDULING RESULT\n\nService order: " + initialHeadPosition + " -> " + serviceOrder.toString().replace("[", "").replace("]", "") + "\nTotal head movement = " + totalMovement + " cylinders";
     }
 }
