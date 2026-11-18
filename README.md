@@ -17,12 +17,7 @@ Implemented:
 - Segmentation
 - Page replacement
 - Disk scheduling
-
-Work in progress:
-
-
 - Fragmentation
-
 - Multiprogramming
 
 ## ung logic nasa flowgo
