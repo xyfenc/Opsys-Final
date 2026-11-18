@@ -15,10 +15,10 @@ Implemented:
 - Deadlock detection
 - Paging
 - Segmentation
-
+- Page replacement
 Work in progress:
 
-- Page replacement
+
 - Fragmentation
 - Disk scheduling
 - Multiprogramming
