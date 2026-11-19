@@ -128,6 +128,10 @@ public class JavaApplication extends JFrame {
             item.setOpaque(true);
             item.setBorder(new EmptyBorder(10, 10, 10, 8));
             item.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            item.setAlignmentX(Component.LEFT_ALIGNMENT);
+            item.setPreferredSize(new Dimension(213, 38));
+            item.setMinimumSize(new Dimension(213, 38));
+            item.setMaximumSize(new Dimension(213, 38));
             item.addActionListener(e -> showModule(index));
             sidebarItems.add(item);
             panel.add(item);

@@ -7,7 +7,7 @@ public final class ResourceAllocation {
         if (allocationMatrix.length != processCount || requestOrMaximumMatrix.length != processCount || availableResources.length != resourceCount) throw new Exception("Matrix dimensions do not match.");
         int[] remainingResources = availableResources.clone(); boolean[] processFinished = new boolean[processCount];
         ArrayList<Integer> sequence = new ArrayList<>(); boolean madeProgress = true;
-        StringBuilder calculation = new StringBuilder("CALCULATION WALKTHROUGH\nInitial available = ")
+        StringBuilder calculation = new StringBuilder(safetyCheck ? "SAFETY CHECK\nInitial available = " : "DEADLOCK CHECK\nInitial available = ")
             .append(java.util.Arrays.toString(remainingResources)).append("\n");
         while (madeProgress) {
             madeProgress = false;

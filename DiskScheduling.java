@@ -23,7 +23,7 @@ public final class DiskScheduling {
         int totalMovement = 0; currentHeadPosition = initialHeadPosition;
         for (int cylinder : serviceOrder) { totalMovement += Math.abs(cylinder - currentHeadPosition); currentHeadPosition = cylinder; }
         StringBuilder result = new StringBuilder("DISK SCHEDULING RESULT\n\n");
-        result.append("CALCULATION WALKTHROUGH\n");
+        result.append("HEAD MOVEMENT CHECK\n");
         int previous = initialHeadPosition;
         for (int cylinder : serviceOrder) {
             result.append("Move ").append(Math.abs(cylinder - previous)).append(" cylinders: |").append(cylinder).append(" - ").append(previous).append("|.\n");
