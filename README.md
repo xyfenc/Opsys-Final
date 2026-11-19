@@ -6,6 +6,11 @@ javac *.java
 java JavaApplication
 ```
 
+## Documentation
+
+Read the complete formulas, computation flow, and result explanations in the
+[Algorithm Guide](ALGORITHM_GUIDE.md).
+
 ## Current progress
 
 Implemented:
