@@ -15,14 +15,24 @@ public final class CpuScheduling {
         }
         int currentTime = 0, completedProcesses = 0;
         ArrayDeque<Integer> readyQueue = new ArrayDeque<>();
+        StringBuilder calculation = new StringBuilder("CALCULATION WALKTHROUGH\n");
+        int stepNumber = 1;
         while (completedProcesses < processCount) {
             if (algorithmChoice == 4) {
                 for (int processIndex = 0; processIndex < processCount; processIndex++)
                     if (remainingTimes[processIndex] > 0 && arrivalTimes[processIndex] <= currentTime && !readyQueue.contains(processIndex)) readyQueue.add(processIndex);
-                if (readyQueue.isEmpty()) { currentTime++; continue; }
+                if (readyQueue.isEmpty()) {
+                    calculation.append(String.format("Step %d: t=%d, no arrived process; advance to t=%d.%n", stepNumber++, currentTime, currentTime + 1));
+                    currentTime++;
+                    continue;
+                }
                 int processIndex = readyQueue.remove();
+                int startTime = currentTime;
                 int executionTime = Math.min(timeQuantum, remainingTimes[processIndex]);
                 currentTime += executionTime; remainingTimes[processIndex] -= executionTime;
+                calculation.append(String.format("Step %d: run P%d from t=%d to t=%d (min(quantum %d, remaining %d) = %d).%n",
+                    stepNumber++, processIndex, startTime, currentTime, timeQuantum,
+                    remainingTimes[processIndex] + executionTime, executionTime));
                 for (int otherProcessIndex = 0; otherProcessIndex < processCount; otherProcessIndex++)
                     if (remainingTimes[otherProcessIndex] > 0 && arrivalTimes[otherProcessIndex] <= currentTime && !readyQueue.contains(otherProcessIndex) && otherProcessIndex != processIndex) readyQueue.add(otherProcessIndex);
                 if (remainingTimes[processIndex] > 0) readyQueue.add(processIndex);
@@ -35,13 +45,29 @@ public final class CpuScheduling {
                          algorithmChoice == 2 && priorities[processIndex] < priorities[selectedProcess] ||
                          algorithmChoice == 3 && remainingTimes[processIndex] < remainingTimes[selectedProcess] ||
                          algorithmChoice == 0 && arrivalTimes[processIndex] < arrivalTimes[selectedProcess])) selectedProcess = processIndex;
-                if (selectedProcess < 0) { currentTime++; continue; }
+                if (selectedProcess < 0) {
+                    calculation.append(String.format("Step %d: t=%d, no ready process; advance to t=%d.%n", stepNumber++, currentTime, currentTime + 1));
+                    currentTime++;
+                    continue;
+                }
+                int startTime = currentTime;
                 currentTime++; remainingTimes[selectedProcess]--;
-                if (algorithmChoice != 3) { currentTime += remainingTimes[selectedProcess]; remainingTimes[selectedProcess] = 0; }
+                if (algorithmChoice != 3) {
+                    int remainingBeforeFinish = remainingTimes[selectedProcess];
+                    currentTime += remainingTimes[selectedProcess]; remainingTimes[selectedProcess] = 0;
+                    calculation.append(String.format("Step %d: choose P%d at t=%d; run for %d units, so completion = %d.%n",
+                        stepNumber++, selectedProcess, startTime, remainingBeforeFinish + 1, currentTime));
+                } else {
+                    calculation.append(String.format("Step %d: choose shortest remaining P%d for t=%d to t=%d; remaining = %d.%n",
+                        stepNumber++, selectedProcess, startTime, currentTime, remainingTimes[selectedProcess]));
+                }
                 if (remainingTimes[selectedProcess] == 0) { completionTimes[selectedProcess] = currentTime; completedProcesses++; }
             }
         }
-        StringBuilder result = new StringBuilder("CPU SCHEDULING RESULT\n\nProcess  Arrival  Burst  Completion  Turnaround  Waiting\n");
+        StringBuilder result = new StringBuilder("CPU SCHEDULING RESULT\n\n");
+        result.append(calculation).append("\n");
+        result.append("FORMULAS: turnaround = completion - arrival; waiting = turnaround - burst.\n\n");
+        result.append("Process  Arrival  Burst  Completion  Turnaround  Waiting\n");
         double totalTurnaround = 0, totalWaiting = 0;
         for (int processIndex = 0; processIndex < processCount; processIndex++) {
             int turnaroundTime = completionTimes[processIndex] - arrivalTimes[processIndex];
