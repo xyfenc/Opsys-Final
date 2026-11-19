@@ -13,8 +13,9 @@ public class JavaApplication extends JFrame {
     private final JPanel root = new JPanel(new BorderLayout());
     private final JPanel main = new JPanel(new BorderLayout(0, 18));
     private final JScrollPane outputPane = new JScrollPane(resultOutput);
-    private final JButton pauseResumeButton = button("Pause");
-    private final JButton stopButton = button("Stop");
+    private final AnimatedButton pauseResumeButton = new AnimatedButton("");
+    private final AnimatedButton stopButton = new AnimatedButton("");
+    private final AnimatedButton.PausePlayIcon pausePlayIcon = new AnimatedButton.PausePlayIcon();
     private javax.swing.Timer stepTimer;
     private String[] resultSteps = new String[0];
     private int currentStep;
@@ -36,6 +37,8 @@ public class JavaApplication extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1080, 700));
         setLocationRelativeTo(null);
+        root.putClientProperty("theme.page", Boolean.TRUE);
+        main.putClientProperty("theme.page", Boolean.TRUE);
 
         root.add(sidebar(), BorderLayout.WEST);
 
@@ -72,6 +75,12 @@ public class JavaApplication extends JFrame {
         resultOutput.setBorder(new EmptyBorder(18, 18, 18, 18));
         
         outputPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        configureButton(pauseResumeButton);
+        configureButton(stopButton);
+        pauseResumeButton.setIcon(pausePlayIcon);
+        pauseResumeButton.setToolTipText("Pause");
+        stopButton.setIcon(new AnimatedButton.StopIcon());
+        stopButton.setToolTipText("Stop");
         pauseResumeButton.setEnabled(false);
         stopButton.setEnabled(false);
         pauseResumeButton.addActionListener(e -> togglePauseResume());
@@ -90,6 +99,7 @@ public class JavaApplication extends JFrame {
 
     private JPanel sidebar() {
         var panel = new JPanel();
+        panel.putClientProperty("theme.sidebar", Boolean.TRUE);
         panel.setPreferredSize(new Dimension(245, 0));
         panel.setBorder(new EmptyBorder(25, 16, 20, 16));
         panel.setBackground(Theme.SIDEBAR_BACKGROUND);
@@ -103,15 +113,13 @@ public class JavaApplication extends JFrame {
         
         for (int i = 0; i < MODULES.length; i++) {
             final int index = i;
-            var item = new JButton(String.format("%02d   %s", i + 1, MODULES[i]));
+            var item = new AnimatedButton(String.format("%02d   %s", i + 1, MODULES[i]));
             item.setHorizontalAlignment(SwingConstants.LEFT);
             item.setForeground(Theme.SIDEBAR_TEXT);
             item.setBackground(Theme.SIDEBAR_BACKGROUND);
             item.setOpaque(true);
-            item.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.SIDEBAR_BORDER),
-                new EmptyBorder(10, 10, 10, 8)));
-            item.setFocusPainted(false);
+            item.setBorder(new EmptyBorder(10, 10, 10, 8));
+            item.setFont(new Font("SansSerif", Font.PLAIN, 13));
             item.addActionListener(e -> showModule(index));
             panel.add(item);
         }
@@ -217,7 +225,7 @@ public class JavaApplication extends JFrame {
     }
 
     private JPanel card() { var p = new JPanel(); cards.add(p); p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Theme.LIGHT_BORDER), new EmptyBorder(22, 22, 22, 22))); return p; }
-    private JLabel label(String text) { var l = new JLabel(text); l.setFont(new Font("SansSerif", Font.BOLD, 12)); l.setBorder(new EmptyBorder(8, 0, 4, 0)); return l; }
+    private JLabel label(String text) { var l = new JLabel(text); l.setOpaque(true); l.setBackground(Theme.LIGHT_HEADER); l.setForeground(Theme.LIGHT_TEXT); l.setFont(new Font("SansSerif", Font.BOLD, 12)); l.setBorder(new EmptyBorder(8, 8, 4, 8)); return l; }
     private JTextField input(String text) { var f = new JTextField(text); style(f); return f; }
     private JTextArea area(String text) { var a = new JTextArea(text, 4, 20); style(a); return a; }
     private JComboBox<String> combo(String... values) { var c = new JComboBox<>(values); style(c); return c; }
@@ -228,8 +236,17 @@ public class JavaApplication extends JFrame {
         c.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Theme.LIGHT_BORDER), new EmptyBorder(7, 8, 7, 8))); 
     }
     private void add(JPanel p, String name, JComponent component) { p.add(label(name)); p.add(component); }
-    private JButton button(String text) { 
-        var b = new JButton(text); b.setForeground(Color.WHITE); b.setBackground(Theme.BUTTON); b.setFont(new Font("SansSerif", Font.BOLD, 12)); b.setFocusPainted(false); b.setBorder(new EmptyBorder(10, 14, 10, 14)); return b; 
+    private AnimatedButton button(String text) {
+        var b = new AnimatedButton(text);
+        configureButton(b);
+        return b;
+    }
+
+    private void configureButton(AnimatedButton button) {
+        button.setForeground(Color.WHITE);
+        button.setBackground(Theme.BUTTON);
+        button.setFont(new Font("SansSerif", Font.BOLD, 12));
+        button.setBorder(new EmptyBorder(10, 14, 10, 14));
     }
 
     private void addSimulationButtons(JPanel panel, String runText, ResultAction action) {
@@ -252,7 +269,8 @@ public class JavaApplication extends JFrame {
         resultSteps = result.split("\\R");
         currentStep = 0;
         resultOutput.setText("");
-        pauseResumeButton.setText("Pause");
+        pausePlayIcon.setRunning(true, pauseResumeButton);
+        pauseResumeButton.setToolTipText("Pause");
         pauseResumeButton.setEnabled(true);
         stopButton.setEnabled(true);
         stepTimer = new javax.swing.Timer(800, e -> {
@@ -270,10 +288,12 @@ public class JavaApplication extends JFrame {
         if (stepTimer == null) return;
         if (stepTimer.isRunning()) {
             stepTimer.stop();
-            pauseResumeButton.setText("Resume");
+            pausePlayIcon.setRunning(false, pauseResumeButton);
+            pauseResumeButton.setToolTipText("Resume");
         } else {
             stepTimer.start();
-            pauseResumeButton.setText("Pause");
+            pausePlayIcon.setRunning(true, pauseResumeButton);
+            pauseResumeButton.setToolTipText("Pause");
         }
     }
 
@@ -282,38 +302,26 @@ public class JavaApplication extends JFrame {
             stepTimer.stop();
             stepTimer = null;
         }
-        pauseResumeButton.setText("Pause");
+        pausePlayIcon.setRunning(true, pauseResumeButton);
+        pauseResumeButton.setToolTipText("Pause");
         pauseResumeButton.setEnabled(false);
         stopButton.setEnabled(false);
     }
 
     private void applyTheme() {
-        Theme.apply(main, darkMode);
-        Color page = darkMode ? Theme.DARK_BACKGROUND : Theme.LIGHT_BACKGROUND;
-        Color panel = darkMode ? Theme.DARK_PANEL : Theme.LIGHT_PANEL;
-        Color text = darkMode ? Theme.DARK_TEXT : Theme.LIGHT_TEXT;
         Color border = darkMode ? Theme.DARK_BORDER : Theme.LIGHT_BORDER;
-        for (JPanel card : cards) {
-            card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(border), new EmptyBorder(22, 22, 22, 22)));
-        }
-        root.setBackground(page);
-        main.setBackground(page);
-        moduleForms.setBackground(panel);
-        resultOutput.setBackground(panel);
-        resultOutput.setForeground(text);
-        resultOutput.setCaretColor(text);
-        outputPane.getViewport().setBackground(panel);
+        Color text = darkMode ? Theme.DARK_TEXT : Theme.LIGHT_TEXT;
         outputPane.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(border), "Simulation result",
             0, 0, new Font("SansSerif", Font.BOLD, 15), text));
+        Theme.apply(root, darkMode);
         main.revalidate();
         main.repaint();
     }
     
     private int[] parseNumbers(String text) { return Arrays.stream(text.trim().split("[,\\s]+")).filter(s -> !s.isEmpty()).mapToInt(Integer::parseInt).toArray(); }
     private int[][] parseMatrix(String text) { return Arrays.stream(text.trim().split("\\n|;")).filter(s -> !s.trim().isEmpty()).map(this::parseNumbers).toArray(int[][]::new); }
-    private void showModule(int i) { stopSteps(); moduleTitle.setText(MODULES[i]); moduleCardLayout.show(moduleForms, "m" + i); resultOutput.setText("Fill out the inputs and then run the simulation."); }
+    private void showModule(int i) { stopSteps(); moduleTitle.setText(MODULES[i]); moduleCardLayout.show(moduleForms, "m" + i); applyTheme(); resultOutput.setText("Fill out the inputs and then run the simulation."); }
     private void showError(Exception e) { stopSteps(); resultOutput.setText("INPUT ERROR\n\n" + e.getMessage()); }
     
     public static void main(String[] args) { SwingUtilities.invokeLater(() -> new JavaApplication().setVisible(true)); }
