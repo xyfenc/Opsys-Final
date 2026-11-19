@@ -40,14 +40,27 @@ public final class Multiprogramming {
         int peakMemoryUse = 0;
 
         int admitted = admitProcesses(waitingQueue, readyQueue, memoryRequirements, totalMemory, memoryInUse);
+        result.append("@TABLE|PROCESS MEMORY ADMISSION|Process|CPU burst|Memory required|Admission\n");
+        StringBuilder admissionCalculations = new StringBuilder("CALCULATIONS\n");
+        int memoryDuringAdmission = 0;
         for (int processIndex = 0; processIndex < processCount; processIndex++) {
+            boolean isAdmitted = readyQueue.contains(processIndex);
+            int availableForProcess = totalMemory - memoryDuringAdmission;
+            result.append("@ROW|P").append(processIndex + 1).append('|').append(burstTimes[processIndex]).append('|')
+                .append(memoryRequirements[processIndex]).append('|').append(isAdmitted ? "ADMITTED" : "WAITING").append('\n');
+            admissionCalculations.append("P").append(processIndex + 1).append(": Required memory <= available memory -> ")
+                .append(memoryRequirements[processIndex]).append(" <= ").append(availableForProcess).append(" = ").append(isAdmitted).append('\n');
+            if (isAdmitted) memoryDuringAdmission += memoryRequirements[processIndex];
             result.append("P").append(processIndex + 1).append(": burst ")
                 .append(burstTimes[processIndex]).append(", memory ")
                 .append(memoryRequirements[processIndex]).append(" -> ")
-                .append(readyQueue.contains(processIndex) ? "ADMITTED" : "WAITING").append("\n");
+                .append(isAdmitted ? "ADMITTED" : "WAITING").append("\n");
         }
+        result.append("@ENDTABLE\n\n").append(admissionCalculations).append('\n');
         memoryInUse = admitted;
         peakMemoryUse = memoryInUse;
+        StringBuilder executionRows = new StringBuilder();
+        StringBuilder executionCalculations = new StringBuilder("CALCULATIONS\n");
         result.append("\nInitial memory in use = ").append(memoryInUse).append(" / ").append(totalMemory)
             .append("\nReady queue = ").append(formatQueue(readyQueue))
             .append("\nWaiting queue = ").append(formatQueue(waitingQueue)).append("\n\n");
@@ -62,6 +75,8 @@ public final class Multiprogramming {
             }
 
             int processIndex = readyQueue.removeFirst();
+            long startTime = currentTime;
+            int remainingBefore = remainingTimes[processIndex];
             int executionTime = Math.min(timeQuantum, remainingTimes[processIndex]);
             int memoryDuringExecution = memoryInUse;
             result.append("Time ").append(currentTime).append(" - ").append(currentTime + executionTime)
@@ -73,9 +88,19 @@ public final class Multiprogramming {
             busyTime += executionTime;
             memoryTime += (long) memoryDuringExecution * executionTime;
             remainingTimes[processIndex] -= executionTime;
+            executionRows.append("@ROW|").append(startTime).append('|').append(currentTime).append("|P")
+                .append(processIndex + 1).append('|').append(timeQuantum).append('|').append(remainingBefore).append('|')
+                .append(executionTime).append('|').append(remainingTimes[processIndex]).append('|')
+                .append(memoryDuringExecution).append(" / ").append(totalMemory).append('\n');
+            executionCalculations.append("P").append(processIndex + 1).append(": CPU time slice = min(Time quantum, remaining burst) -> min(")
+                .append(timeQuantum).append(", ").append(remainingBefore).append(") = ").append(executionTime)
+                .append("; remaining burst = ").append(remainingBefore).append(" - ").append(executionTime).append(" = ")
+                .append(remainingTimes[processIndex]).append('\n');
             if (remainingTimes[processIndex] == 0) {
                 memoryInUse -= memoryRequirements[processIndex];
                 completedProcesses++;
+                executionCalculations.append("Memory released = ").append(memoryDuringExecution).append(" - ")
+                    .append(memoryRequirements[processIndex]).append(" = ").append(memoryInUse).append('\n');
                 result.append("P").append(processIndex + 1).append(" completes; memory released = ")
                     .append(memoryRequirements[processIndex]).append("\n");
             } else {
@@ -96,7 +121,11 @@ public final class Multiprogramming {
         double cpuUtilization = currentTime == 0 ? 0 : 100.0 * busyTime / currentTime;
         double averageMemoryUtilization = currentTime == 0 ? 0 : 100.0 * memoryTime / ((double) totalMemory * currentTime);
         double peakMemoryUtilization = 100.0 * peakMemoryUse / totalMemory;
-        result.append("FINAL SUMMARY\n")
+        result.append("@TABLE|CPU TIME SLICES|Start|End|Process|Quantum|Remaining before|Ran|Remaining after|Memory in use\n")
+            .append(executionRows).append("@ENDTABLE\n\n").append(executionCalculations)
+            .append("CPU utilization = busy time / elapsed time -> ").append(busyTime).append(" / ").append(currentTime).append(" = ").append(String.format(Locale.ROOT, "%.2f%%", cpuUtilization)).append('\n')
+            .append("Average memory utilization = memory-time / (total memory x elapsed time) -> ").append(memoryTime).append(" / (").append(totalMemory).append(" x ").append(currentTime).append(") = ").append(String.format(Locale.ROOT, "%.2f%%", averageMemoryUtilization)).append('\n')
+            .append("Peak memory utilization = peak memory / total memory -> ").append(peakMemoryUse).append(" / ").append(totalMemory).append(" = ").append(String.format(Locale.ROOT, "%.2f%%", peakMemoryUtilization)).append("\n\nFINAL SUMMARY\n")
             .append("All processes completed = ").append(completedProcesses).append(" / ").append(processCount).append("\n")
             .append("Total elapsed time = ").append(currentTime).append("\n")
             .append(String.format(Locale.ROOT, "CPU utilization = %.2f%%%n", cpuUtilization))

@@ -21,7 +21,19 @@ public final class DiskScheduling {
             else { Collections.reverse(lowerRequests); serviceOrder.addAll(lowerRequests); serviceOrder.add(0); serviceOrder.addAll(higherRequests); }
         }
         int totalMovement = 0; currentHeadPosition = initialHeadPosition;
-        for (int cylinder : serviceOrder) { totalMovement += Math.abs(cylinder - currentHeadPosition); currentHeadPosition = cylinder; }
-        return "DISK SCHEDULING RESULT\n\nService order: " + initialHeadPosition + " -> " + serviceOrder.toString().replace("[", "").replace("]", "") + "\nTotal head movement = " + totalMovement + " cylinders";
+        StringBuilder result = new StringBuilder("DISK SCHEDULING RESULT\n\n@TABLE|DISK HEAD MOVEMENT|Step|Current|Next cylinder|Seek distance\n");
+        StringBuilder calculations = new StringBuilder("CALCULATIONS\n");
+        int step = 1;
+        for (int cylinder : serviceOrder) {
+            int seekDistance = Math.abs(cylinder - currentHeadPosition);
+            totalMovement += seekDistance;
+            result.append("@ROW|").append(step++).append('|').append(currentHeadPosition).append('|').append(cylinder).append('|').append(seekDistance).append('\n');
+            calculations.append("Seek = |Current - Next| -> |").append(currentHeadPosition).append(" - ").append(cylinder).append("| = ").append(seekDistance).append('\n');
+            currentHeadPosition = cylinder;
+        }
+        return result.append("@ENDTABLE\n\nService order: ").append(initialHeadPosition).append(" -> ")
+            .append(serviceOrder.toString().replace("[", "").replace("]", ""))
+            .append("\n\n").append(calculations).append("Total seek time = sum of seek distances -> ").append(totalMovement)
+            .append(" cylinders\n\nTotal head movement = ").append(totalMovement).append(" cylinders").toString();
     }
 }

@@ -1,4 +1,6 @@
 import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public final class CpuScheduling {
     private CpuScheduling() {}
@@ -41,14 +43,27 @@ public final class CpuScheduling {
                 if (remainingTimes[selectedProcess] == 0) { completionTimes[selectedProcess] = currentTime; completedProcesses++; }
             }
         }
-        StringBuilder result = new StringBuilder("CPU SCHEDULING RESULT\n\nProcess  Arrival  Burst  Completion  Turnaround  Waiting\n");
+        StringBuilder result = new StringBuilder("CPU SCHEDULING RESULT\n\n@TABLE|PROCESS TIMING|Process|Arrival|Burst|Completion|Turnaround|Waiting\n");
+        Integer[] completionOrder = new Integer[processCount];
+        for (int processIndex = 0; processIndex < processCount; processIndex++) completionOrder[processIndex] = processIndex;
+        Arrays.sort(completionOrder, Comparator.comparingInt(processIndex -> completionTimes[processIndex]));
         double totalTurnaround = 0, totalWaiting = 0;
-        for (int processIndex = 0; processIndex < processCount; processIndex++) {
+        for (int processIndex : completionOrder) {
             int turnaroundTime = completionTimes[processIndex] - arrivalTimes[processIndex];
             int waitingTime = turnaroundTime - burstTimes[processIndex];
             totalTurnaround += turnaroundTime; totalWaiting += waitingTime;
-            result.append(String.format("P%-7d %-8d %-6d %-11d %-11d %d%n", processIndex, arrivalTimes[processIndex], burstTimes[processIndex], completionTimes[processIndex], turnaroundTime, waitingTime));
+            result.append("@ROW|P").append(processIndex).append('|').append(arrivalTimes[processIndex]).append('|')
+                .append(burstTimes[processIndex]).append('|').append(completionTimes[processIndex]).append('|')
+                .append(turnaroundTime).append('|').append(waitingTime).append('\n');
         }
-        return result.append(String.format("%nAverage turnaround time = %.2f%nAverage waiting time    = %.2f", totalTurnaround / processCount, totalWaiting / processCount)).toString();
+        result.append("@ENDTABLE\n\nCALCULATIONS\n");
+        for (int processIndex : completionOrder) {
+            int turnaroundTime = completionTimes[processIndex] - arrivalTimes[processIndex];
+            int waitingTime = turnaroundTime - burstTimes[processIndex];
+            result.append(String.format("P%d: Turnaround = Completion - Arrival -> %d - %d = %d; Waiting = Turnaround - Burst -> %d - %d = %d%n",
+                processIndex, completionTimes[processIndex], arrivalTimes[processIndex], turnaroundTime,
+                turnaroundTime, burstTimes[processIndex], waitingTime));
+        }
+        return result.append(String.format("%nAverage turnaround time = %.2f%nAverage waiting time = %.2f", totalTurnaround / processCount, totalWaiting / processCount)).toString();
     }
 }
