@@ -8,7 +8,7 @@ public final class PageReplacement {
         Arrays.fill(frames, -1); Arrays.fill(lastUsedAt, -1);
         int fifoPointer = 0, hitCount = 0, faultCount = 0;
         StringBuilder result = new StringBuilder("PAGE REPLACEMENT RESULT\n\n");
-        result.append("CALCULATION WALKTHROUGH\n");
+        result.append("PAGE CHECK\n");
         result.append("For each reference, search the frames first: present = HIT; absent = FAULT and replace according to the selected policy.\n\n");
         result.append("Reference  Status  Frames\n");
         for (int referenceIndex = 0; referenceIndex < references.length; referenceIndex++) {
@@ -34,8 +34,12 @@ public final class PageReplacement {
                 }
             } else hitCount++;
             frames[replacementFrame] = page; lastUsedAt[replacementFrame] = referenceIndex;
+            result.append("Step ").append(referenceIndex + 1).append(": reference ").append(page)
+                .append(status.equals("HIT") ? " is already in a frame -> HIT." : " is absent -> FAULT; place it in frame ")
+                .append(replacementFrame).append("\n");
             result.append(String.format("%-10d %-7s %s%n", page, status, Arrays.toString(frames)));
         }
-        return result.append(String.format("%nPage faults = %d%nPage hits   = %d%nHit ratio   = %.2f%%", faultCount, hitCount, hitCount * 100.0 / references.length)).toString();
+        return result.append(String.format("%nPage faults = %d%nPage hits   = %d%nHit ratio = (%d / %d) * 100 = %.2f%%",
+            faultCount, hitCount, hitCount, references.length, hitCount * 100.0 / references.length)).toString();
     }
 }

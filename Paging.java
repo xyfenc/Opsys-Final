@@ -25,7 +25,7 @@ result.append("PAGING RESULT\n\n");
 result.append("Page number       : ").append(pageNumber).append("\n");
 result.append("Offset             : ").append(offsetWithinPage).append("\n");
 result.append("Frame number       : ").append(frameNumber);
-result.append("\n\nCALCULATION WALKTHROUGH\n");
+result.append("\n\nADDRESS CHECK\n");
 result.append("page number = logical address / page size = ").append(logicalAddress).append(" / ").append(pageSize).append(" = ").append(pageNumber).append("\n");
 result.append("offset = logical address % page size = ").append(logicalAddress).append(" % ").append(pageSize).append(" = ").append(offsetWithinPage).append("\n");
 result.append("page table[").append(pageNumber).append("] = frame ").append(frameNumber).append("\n");
@@ -35,7 +35,8 @@ if (pageNotInMemory) {
 } else {
     // Physical address = start of the frame + the offset inside that frame
     int physicalAddress = frameNumber * pageSize + offsetWithinPage;
-    result.append("\nPhysical address   : ").append(physicalAddress);
+    result.append("\nPhysical address   : ").append(frameNumber).append(" * ").append(pageSize)
+        .append(" + ").append(offsetWithinPage).append(" = ").append(physicalAddress);
 }
 
 return result.toString();

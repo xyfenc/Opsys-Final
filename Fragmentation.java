@@ -50,7 +50,7 @@ public final class Fragmentation {
             }
         }
 
-        StringBuilder result = new StringBuilder("FRAGMENTATION RESULT\n\n");
+        StringBuilder result = new StringBuilder("FRAGMENTATION RESULT\n\nMEMORY CHECK\n");
         result.append("Allocation strategy: ").append(strategies[strategyChoice]).append("\n\nAllocations:\n");
         for (int processIndex = 0; processIndex < processSizes.length; processIndex++) {
             int blockIndex = allocatedBlocks[processIndex];
@@ -62,6 +62,8 @@ public final class Fragmentation {
                 result.append("P").append(processIndex + 1).append(" (").append(processSizes[processIndex])
                     .append(") -> Block ").append(blockIndex + 1).append(" (size ")
                     .append(memoryBlocks[blockIndex]).append(", internal waste ").append(waste).append(")\n");
+                result.append("  Calculation: ").append(memoryBlocks[blockIndex]).append(" - ")
+                    .append(processSizes[processIndex]).append(" = ").append(waste).append(" free units.\n");
             }
         }
 
@@ -74,7 +76,7 @@ public final class Fragmentation {
             }
         }
         if (!hasFreeBlocks) result.append("None\n");
-        return result.append("\nTotal internal fragmentation = ").append(internalFragmentation)
+        return result.append("\nTotal internal fragmentation = sum of block waste = ").append(internalFragmentation)
             .append("\nProcesses not allocated = ").append(unallocatedCount).toString();
     }
 }

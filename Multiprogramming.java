@@ -27,7 +27,7 @@ public final class Multiprogramming {
         ArrayDeque<Integer> waitingQueue = new ArrayDeque<>();
         for (int processIndex = 0; processIndex < processCount; processIndex++) waitingQueue.addLast(processIndex);
 
-        StringBuilder result = new StringBuilder("MULTIPROGRAMMING RESULT\n\n");
+        StringBuilder result = new StringBuilder("MULTIPROGRAMMING RESULT\n\nRUN CHECK\n");
         result.append("Total physical memory = ").append(totalMemory)
             .append("\nTime quantum = ").append(timeQuantum)
             .append("\nProcesses = ").append(processCount).append("\n\n");
@@ -99,6 +99,9 @@ public final class Multiprogramming {
         result.append("FINAL SUMMARY\n")
             .append("All processes completed = ").append(completedProcesses).append(" / ").append(processCount).append("\n")
             .append("Total elapsed time = ").append(currentTime).append("\n")
+            .append("CPU utilization = (busy time ").append(busyTime).append(" / elapsed time ").append(currentTime).append(") * 100\n")
+            .append("Average memory utilization = (memory-time ").append(memoryTime).append(" / (memory ")
+                .append(totalMemory).append(" * elapsed time ").append(currentTime).append(")) * 100\n")
             .append(String.format(Locale.ROOT, "CPU utilization = %.2f%%%n", cpuUtilization))
             .append(String.format(Locale.ROOT, "Average memory utilization = %.2f%%%n", averageMemoryUtilization))
             .append(String.format(Locale.ROOT, "Peak memory utilization = %.2f%%", peakMemoryUtilization));
