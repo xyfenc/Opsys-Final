@@ -55,8 +55,14 @@ public final class AnimatedButton extends JButton {
     }
 
     public void applyTheme(boolean dark, boolean sidebar) {
+        applyTheme(dark, sidebar, false);
+    }
+
+    public void applyTheme(boolean dark, boolean sidebar, boolean selected) {
         darkTheme = dark;
-        Color nextNormal = sidebar ? Theme.SIDEBAR_BUTTON : Theme.BUTTON;
+        Color nextNormal = sidebar
+            ? (selected ? (dark ? Theme.SIDEBAR_SELECTED : Theme.LIGHT_SIDEBAR_SELECTED) : (dark ? Theme.SIDEBAR_BUTTON : Theme.LIGHT_SIDEBAR_BACKGROUND))
+            : Theme.BUTTON;
         Color nextHover = sidebar ? Theme.SIDEBAR_BUTTON_HOVER : Theme.BUTTON_HOVER;
         Color nextPressed = sidebar ? Theme.SIDEBAR_BUTTON_PRESSED : Theme.BUTTON_PRESSED;
         boolean paletteChanged = !nextNormal.equals(normalColor) || !nextHover.equals(hoverColor) || !nextPressed.equals(pressedColor);
@@ -64,7 +70,7 @@ public final class AnimatedButton extends JButton {
         hoverColor = nextHover;
         pressedColor = nextPressed;
         setBackground(normalColor);
-        setForeground(sidebar ? Theme.SIDEBAR_TEXT : Color.WHITE);
+        setForeground(sidebar ? (selected && !dark ? Theme.LIGHT_SIDEBAR_SELECTED_TEXT : dark ? Theme.SIDEBAR_TEXT : Theme.LIGHT_SIDEBAR_TEXT) : Color.WHITE);
         if (paletteChanged || hovered || pressed) animateTo(pressed ? pressedColor : hovered ? hoverColor : normalColor);
         else {
             if (colorTimer != null) colorTimer.stop();

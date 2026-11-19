@@ -33,6 +33,11 @@ public final class Theme {
     public static final Color LIGHT_SCROLL_TRACK = new Color(235, 239, 245);
     public static final Color LIGHT_SCROLL_THUMB = new Color(169, 180, 196);
     public static final Color LIGHT_DIVIDER = new Color(205, 213, 224);
+    public static final Color LIGHT_SIDEBAR_BACKGROUND = new Color(238, 242, 247);
+    public static final Color LIGHT_SIDEBAR_TEXT = new Color(42, 52, 68);
+    public static final Color LIGHT_SIDEBAR_MUTED = new Color(96, 108, 126);
+    public static final Color LIGHT_SIDEBAR_SELECTED = new Color(205, 224, 248);
+    public static final Color LIGHT_SIDEBAR_SELECTED_TEXT = new Color(20, 67, 125);
     public static final Color DARK_BACKGROUND = new Color(30, 36, 47);
     public static final Color DARK_PANEL = new Color(41, 49, 63);
     public static final Color DARK_HEADER = new Color(48, 58, 74);
@@ -54,6 +59,7 @@ public final class Theme {
     public static final Color SIDEBAR_TEXT = new Color(202, 211, 226);
     public static final Color SIDEBAR_BORDER = new Color(48, 58, 75);
     public static final Color SIDEBAR_MUTED = new Color(137, 148, 166);
+    public static final Color SIDEBAR_SELECTED = new Color(39, 93, 173);
 
     private Theme() {}
 
@@ -66,10 +72,11 @@ public final class Theme {
         boolean sidebar = isInSidebar(component);
 
         if (component instanceof AnimatedButton) {
-            ((AnimatedButton) component).applyTheme(dark, sidebar);
+            AnimatedButton button = (AnimatedButton) component;
+            button.applyTheme(dark, sidebar, Boolean.TRUE.equals(button.getClientProperty("theme.selected")));
         } else if (component instanceof JLabel) {
-            component.setForeground(sidebar ? SIDEBAR_TEXT : text);
-            if (((JLabel) component).isOpaque()) ((JLabel) component).setBackground(sidebar ? SIDEBAR_BACKGROUND : header);
+            component.setForeground(sidebar ? (dark ? SIDEBAR_TEXT : LIGHT_SIDEBAR_TEXT) : text);
+            if (((JLabel) component).isOpaque()) ((JLabel) component).setBackground(sidebar ? (dark ? SIDEBAR_BACKGROUND : LIGHT_SIDEBAR_BACKGROUND) : header);
         } else if (component instanceof JTextComponent) {
             component.setForeground(text);
             component.setBackground(dark ? DARK_INPUT : LIGHT_INPUT);
@@ -122,7 +129,7 @@ public final class Theme {
             ((JScrollPane) component).getViewport().setBackground(background);
         } else if (component instanceof JPanel) {
             boolean pagePanel = component instanceof JComponent && Boolean.TRUE.equals(((JComponent) component).getClientProperty("theme.page"));
-            component.setBackground(sidebar ? SIDEBAR_BACKGROUND : pagePanel ? page : background);
+            component.setBackground(sidebar ? (dark ? SIDEBAR_BACKGROUND : LIGHT_SIDEBAR_BACKGROUND) : pagePanel ? page : background);
         } else if (component instanceof JButton) {
             component.setForeground(Color.WHITE);
             component.setBackground(sidebar ? SIDEBAR_BUTTON : BUTTON);
