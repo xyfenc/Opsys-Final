@@ -10,6 +10,7 @@ public class JavaApplication extends JFrame {
     private final JPanel moduleForms = new JPanel(moduleCardLayout);
     private final JTextArea resultOutput = new JTextArea();
     private final JLabel moduleTitle = new JLabel();
+    private final JLabel moduleDescription = new JLabel();
     private final java.util.List<JPanel> cards = new ArrayList<>();
     private final JPanel root = new JPanel(new BorderLayout());
     private final JPanel main = new JPanel(new BorderLayout(0, 18));
@@ -30,6 +31,17 @@ public class JavaApplication extends JFrame {
         "CPU Scheduling", "Banker's Algorithm", "Deadlock Detection", "Paging",
         "Page Replacement", "Segmentation", "Fragmentation", "Disk Scheduling", "Multiprogramming"
     };
+    private static final String[] MODULE_DESCRIPTIONS = {
+        "Compare scheduling policies and see how each process gets completed.",
+        "Calculate the need matrix and check whether the system is safe.",
+        "Check whether processes are blocked by unavailable resources.",
+        "Translate a logical address into a physical address.",
+        "Track page hits, faults, and frame replacement decisions.",
+        "Check a segment offset and calculate its physical address.",
+        "Place processes into memory blocks and measure wasted space.",
+        "Calculate the order and total movement of disk requests.",
+        "Simulate CPU sharing while processes compete for memory."
+    };
 
     @FunctionalInterface interface Action { void run() throws Exception; }
     @FunctionalInterface interface ResultAction { String run() throws Exception; }
@@ -49,10 +61,19 @@ public class JavaApplication extends JFrame {
 
         main.setBorder(new EmptyBorder(35, 42, 35, 42));
         
-        var heading = new JPanel(new BorderLayout());
+        var heading = new JPanel(new BorderLayout(18, 0));
         heading.setOpaque(false);
+        var headingText = new JPanel();
+        headingText.setOpaque(false);
+        headingText.setLayout(new BoxLayout(headingText, BoxLayout.Y_AXIS));
         moduleTitle.setFont(new Font("SansSerif", Font.BOLD, 32));
-        heading.add(moduleTitle, BorderLayout.WEST);
+        moduleTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        moduleDescription.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        moduleDescription.setAlignmentX(Component.LEFT_ALIGNMENT);
+        headingText.add(moduleTitle);
+        headingText.add(Box.createVerticalStrut(5));
+        headingText.add(moduleDescription);
+        heading.add(headingText, BorderLayout.CENTER);
         
         var autofill = button("Autofill");
         autofill.addActionListener(e -> autofillCurrentForm());
@@ -66,6 +87,7 @@ public class JavaApplication extends JFrame {
             themeButton.setText(darkMode ? "Light mode" : "Dark mode");
             applyTheme();
         });
+        headingButtons.setBorder(new EmptyBorder(4, 0, 0, 0));
         headingButtons.add(pauseResumeButton);
         headingButtons.add(stopButton);
         headingButtons.add(themeButton);
@@ -77,12 +99,11 @@ public class JavaApplication extends JFrame {
         for (int i = 0; i < MODULES.length; i++) moduleForms.add(createForm(i), "m" + i);
         
         resultOutput.setEditable(false);
-        resultOutput.setLineWrap(true);
-        resultOutput.setWrapStyleWord(true);
+        resultOutput.setLineWrap(false);
         resultOutput.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
         resultOutput.setBorder(new EmptyBorder(18, 18, 18, 18));
         
-        outputPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        outputPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         configureButton(pauseResumeButton);
         configureButton(stopButton);
         pauseResumeButton.setIcon(pausePlayIcon);
@@ -497,6 +518,7 @@ public class JavaApplication extends JFrame {
         for (int index = 0; index < sidebarItems.size(); index++)
             sidebarItems.get(index).putClientProperty("theme.selected", index == i);
         moduleTitle.setText(MODULES[i]);
+        moduleDescription.setText(MODULE_DESCRIPTIONS[i]);
         moduleCardLayout.show(moduleForms, "m" + i);
         applyTheme();
         resultOutput.setText("Fill out the inputs and then run the simulation.");
