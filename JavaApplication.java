@@ -2,6 +2,7 @@ import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.JTextComponent;
 
 public class JavaApplication extends JFrame {
@@ -15,7 +16,6 @@ public class JavaApplication extends JFrame {
     private final JScrollPane outputPane = new JScrollPane(resultOutput);
     private final java.util.List<AnimatedButton> sidebarItems = new ArrayList<>();
     private final java.util.Map<Integer, java.util.List<JComponent>> formInputs = new HashMap<>();
-    private final java.util.Map<Integer, String[]> autofillValues = new HashMap<>();
     private final AnimatedButton pauseResumeButton = new AnimatedButton("");
     private final AnimatedButton stopButton = new AnimatedButton("");
     private final AnimatedButton.PausePlayIcon pausePlayIcon = new AnimatedButton.PausePlayIcon();
@@ -156,7 +156,6 @@ public class JavaApplication extends JFrame {
             case 6 -> fragmentation(fields); case 7 -> disk(fields); case 8 -> multiprogramming(fields);
         }
         activeFormIndex = -1;
-        autofillValues.put(index, defaultValues(index));
         panel.add(new JScrollPane(fields), BorderLayout.CENTER);
         return panel;
     }
@@ -165,76 +164,76 @@ public class JavaApplication extends JFrame {
         var algorithm = combo("FCFS", "SJF (non-preemptive)", "Priority (non-preemptive)", "SRTF (preemptive SJF)", "Round Robin");
         var count = input("");
         var quantum = input("");
-        var processes = area("");
+        var processes = tableInput("Process", "Arrival time", "Burst time", "Priority");
         add(p, "Algorithm", algorithm); add(p, "Process count", count); add(p, "Time quantum (Round Robin)", quantum);
         add(p, "Processes: arrival burst priority (one per line)", processes);
         
         addSimulationButtons(p, "Run CPU scheduling", () -> CpuScheduling.simulate(
             algorithm.getSelectedIndex(), Integer.parseInt(count.getText()), 
-            Integer.parseInt(quantum.getText()), parseMatrix(processes.getText())));
+            Integer.parseInt(quantum.getText()), parseMatrix(processes)));
     }
 
     private void banker(JPanel p, boolean safety) {
         var processes = input(""); var resources = input("");
-        var allocation = area("");
-        var second = area("");
-        var available = area("");
+        var allocation = tableInput("Process", "R1", "R2", "R3", "R4", "R5");
+        var second = tableInput("Process", "R1", "R2", "R3", "R4", "R5");
+        var available = tableInput("Resource", "R1", "R2", "R3", "R4", "R5");
         add(p, "Processes (1-5)", processes); add(p, "Resource types (1-3)", resources);
         add(p, "Allocation matrix", allocation); add(p, safety ? "Max matrix" : "Request matrix", second); add(p, "Available resources", available);
         
         addSimulationButtons(p, safety ? "Run safety check" : "Detect deadlock", () -> ResourceAllocation.analyze(
             safety, Integer.parseInt(processes.getText()), Integer.parseInt(resources.getText()), 
-            parseMatrix(allocation.getText()), parseMatrix(second.getText()), parseNumbers(available.getText())));
+            parseMatrix(allocation), parseMatrix(second), parseNumbers(available)));
     }
 
     private void paging(JPanel p) {
-        var size = input(""); var pages = input(""); var table = input(""); var address = input("");
+        var size = input(""); var pages = input(""); var table = tableInput("Page", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"); var address = input("");
         add(p, "Page size", size); add(p, "Logical pages", pages); add(p, "Page table (frame values)", table); add(p, "Logical address", address);
         addSimulationButtons(p, "Translate address", () -> Paging.translate(
             Integer.parseInt(size.getText()), Integer.parseInt(pages.getText()), 
-            Integer.parseInt(address.getText()), parseNumbers(table.getText())));
+            Integer.parseInt(address.getText()), parseNumbers(table)));
     }
 
     private void replacement(JPanel p) {
         var algorithm = combo("FIFO", "LRU", "Optimal");
-        var frames = input(""); var references = input("");
+        var frames = input(""); var references = tableInput("Reference", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
         add(p, "Algorithm", algorithm); add(p, "Number of frames", frames); add(p, "Reference string", references);
         addSimulationButtons(p, "Run page replacement", () -> PageReplacement.simulate(
-            algorithm.getSelectedIndex(), Integer.parseInt(frames.getText()), parseNumbers(references.getText())));
+            algorithm.getSelectedIndex(), Integer.parseInt(frames.getText()), parseNumbers(references)));
     }
 
     private void segmentation(JPanel p) {
-        var bases = input(""); var limits = input(""); var segment = input(""); var offset = input("");
+        var bases = tableInput("Segment", "S1", "S2", "S3", "S4", "S5"); var limits = tableInput("Segment", "S1", "S2", "S3", "S4", "S5"); var segment = input(""); var offset = input("");
         add(p, "Segment bases", bases); add(p, "Segment limits", limits); add(p, "Segment number", segment); add(p, "Offset", offset);
         addSimulationButtons(p, "Translate segment address", () -> Segmentation.translate(
-            parseNumbers(bases.getText()), parseNumbers(limits.getText()), 
+            parseNumbers(bases), parseNumbers(limits), 
             Integer.parseInt(segment.getText()), Integer.parseInt(offset.getText())));
     }
 
     private void fragmentation(JPanel p) {
         var strategy = combo("First Fit", "Best Fit", "Worst Fit");
-        var blocks = input(""); var processes = input("");
+        var blocks = tableInput("Block", "B1", "B2", "B3", "B4", "B5"); var processes = tableInput("Process", "P1", "P2", "P3", "P4", "P5");
         add(p, "Strategy", strategy); add(p, "Memory blocks", blocks); add(p, "Process sizes", processes);
         addSimulationButtons(p, "Allocate processes", () -> Fragmentation.allocate(
-            strategy.getSelectedIndex(), parseNumbers(blocks.getText()), parseNumbers(processes.getText())));
+            strategy.getSelectedIndex(), parseNumbers(blocks), parseNumbers(processes)));
     }
 
     private void disk(JPanel p) {
         var algorithm = combo("FCFS", "SSTF", "SCAN", "C-SCAN");
         var direction = combo("Higher cylinders", "Lower cylinders");
-        var head = input(""); var max = input(""); var requests = input("");
+        var head = input(""); var max = input(""); var requests = tableInput("Request", "1", "2", "3", "4", "5", "6", "7", "8", "9");
         add(p, "Algorithm", algorithm); add(p, "Direction", direction); add(p, "Initial head", head); add(p, "Max cylinder", max); add(p, "Request queue", requests);
         addSimulationButtons(p, "Run disk scheduling", () -> DiskScheduling.simulate(
             algorithm.getSelectedIndex(), direction.getSelectedIndex(), Integer.parseInt(head.getText()), 
-            Integer.parseInt(max.getText()), parseNumbers(requests.getText())));
+            Integer.parseInt(max.getText()), parseNumbers(requests)));
     }
 
     private void multiprogramming(JPanel p) {
-        var memory = input(""); var quantum = input(""); var bursts = input(""); var needs = input("");
+        var memory = input(""); var quantum = input(""); var bursts = tableInput("Process", "P1", "P2", "P3", "P4", "P5"); var needs = tableInput("Process", "P1", "P2", "P3", "P4", "P5");
         add(p, "Total physical memory", memory); add(p, "Time quantum", quantum); add(p, "CPU burst times", bursts); add(p, "Memory requirements", needs);
         addSimulationButtons(p, "Run multiprogramming", () -> Multiprogramming.simulate(
             Integer.parseInt(memory.getText()), Integer.parseInt(quantum.getText()), 
-            parseNumbers(bursts.getText()), parseNumbers(needs.getText())));
+            parseNumbers(bursts), parseNumbers(needs)));
     }
 
     private JPanel card() { var p = new JPanel(); cards.add(p); p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Theme.LIGHT_BORDER), new EmptyBorder(22, 22, 22, 22))); return p; }
@@ -253,6 +252,21 @@ public class JavaApplication extends JFrame {
     private JTextField input(String text) { var f = new JTextField(text); style(f); return f; }
     private JTextArea area(String text) { var a = new JTextArea(text, 4, 20); style(a); return a; }
     private JComboBox<String> combo(String... values) { var c = new JComboBox<>(values); style(c); return c; }
+    private JTable tableInput(String... headers) {
+        boolean matrix = headers[0].equals("Process")
+            && (headers[1].equals("Arrival time") || headers[1].startsWith("R"));
+        int rows = matrix ? 8 : 1;
+        var model = new DefaultTableModel(headers, rows) {
+            @Override public boolean isCellEditable(int row, int column) { return column > 0; }
+        };
+        var table = new JTable(model);
+        for (int row = 0; row < rows; row++) table.setValueAt(headers[0].equals("Process") ? "P" + (row + 1) : "Value", row, 0);
+        table.setRowHeight(28);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.getTableHeader().setReorderingAllowed(false);
+        style(table);
+        return table;
+    }
     
     private void style(JComponent c) { 
         c.setForeground(Theme.LIGHT_TEXT); c.setBackground(Theme.LIGHT_INPUT); 
@@ -265,31 +279,77 @@ public class JavaApplication extends JFrame {
         if (activeFormIndex >= 0) formInputs.get(activeFormIndex).add(component);
     }
 
-    private String[] defaultValues(int index) {
-        return switch (index) {
-            case 0 -> new String[] {"4", "2", "0 5 1\n1 3 2\n2 8 3\n3 4 4"};
-            case 1 -> new String[] {"3", "3", "0 1 0\n2 0 0\n3 0 2", "7 5 3\n3 2 2\n9 0 2", "3 3 2"};
-            case 2 -> new String[] {"3", "3", "0 1 0\n2 0 0\n3 0 2", "0 0 0\n2 0 2\n0 0 2", "3 3 2"};
-            case 3 -> new String[] {"256", "4", "2 5 -1 1", "520"};
-            case 4 -> new String[] {"3", "7 0 1 2 0 3 0 4 2 3 0 3 2"};
-            case 5 -> new String[] {"1000 2000 3000", "400 500 250", "1", "120"};
-            case 6 -> new String[] {"100 500 200 300 600", "212 417 112 426"};
-            case 7 -> new String[] {"53", "199", "98 183 37 122 14 124 65"};
-            case 8 -> new String[] {"100", "3", "8 4 9 5", "30 40 50 20"};
-            default -> new String[0];
-        };
-    }
-
     private void autofillCurrentForm() {
         java.util.List<JComponent> controls = formInputs.get(activeModule);
-        String[] values = autofillValues.get(activeModule);
-        if (controls == null || values == null) return;
+        if (controls == null) return;
+        String[] values = randomValues(activeModule);
         int valueIndex = 0;
         for (JComponent control : controls) {
             if (control instanceof JTextComponent text && valueIndex < values.length)
                 text.setText(values[valueIndex++]);
+            else if (control instanceof JTable table && valueIndex < values.length)
+                fillTable(table, values[valueIndex++]);
         }
-        resultOutput.setText("Sample values filled in. Adjust them if needed, then run the simulation.");
+        resultOutput.setText("Random values filled in. Adjust them if needed, then run the simulation.");
+    }
+
+    private String[] randomValues(int index) {
+        Random random = new Random();
+        return switch (index) {
+            case 0 -> {
+                int count = 3 + random.nextInt(4);
+                StringBuilder rows = new StringBuilder();
+                for (int i = 0; i < count; i++)
+                    rows.append(random.nextInt(5)).append(' ').append(1 + random.nextInt(8)).append(' ').append(1 + random.nextInt(5)).append('\n');
+                yield new String[] {String.valueOf(count), String.valueOf(1 + random.nextInt(4)), rows.toString().trim()};
+            }
+            case 1, 2 -> {
+                int count = 2 + random.nextInt(3), resources = 2 + random.nextInt(3);
+                StringBuilder allocation = new StringBuilder(), second = new StringBuilder();
+                for (int row = 0; row < count; row++) {
+                    for (int column = 0; column < resources; column++) {
+                        if (column > 0) { allocation.append(' '); second.append(' '); }
+                        allocation.append(random.nextInt(3));
+                        second.append(random.nextInt(index == 1 ? 7 : 3));
+                    }
+                    if (row + 1 < count) { allocation.append('\n'); second.append('\n'); }
+                }
+                StringBuilder available = new StringBuilder();
+                for (int column = 0; column < resources; column++) {
+                    if (column > 0) available.append(' ');
+                    available.append(2 + random.nextInt(5));
+                }
+                yield new String[] {String.valueOf(count), String.valueOf(resources), allocation.toString(), second.toString(), available.toString()};
+            }
+            case 3 -> {
+                int pageCount = 3 + random.nextInt(4), pageSize = 128 + random.nextInt(3) * 128;
+                StringBuilder table = new StringBuilder();
+                for (int i = 0; i < pageCount; i++) {
+                    if (i > 0) table.append(' ');
+                    table.append(random.nextInt(6) == 0 ? -1 : random.nextInt(8));
+                }
+                yield new String[] {String.valueOf(pageSize), String.valueOf(pageCount), table.toString(), String.valueOf(random.nextInt(pageCount * pageSize))};
+            }
+            case 4 -> new String[] {String.valueOf(2 + random.nextInt(3)), randomSequence(random, 10 + random.nextInt(7), 6)};
+            case 5 -> new String[] {randomSequence(random, 3, 3000), randomSequence(random, 3, 600), String.valueOf(random.nextInt(3)), String.valueOf(20 + random.nextInt(200))};
+            case 6 -> new String[] {randomSequence(random, 5, 700, 50), randomSequence(random, 4, 450, 50)};
+            case 7 -> new String[] {"40", "199", randomSequence(random, 7, 190)};
+            case 8 -> new String[] {"100", String.valueOf(1 + random.nextInt(4)), randomSequence(random, 4, 10, 1), randomSequence(random, 4, 70, 10)};
+            default -> new String[0];
+        };
+    }
+
+    private String randomSequence(Random random, int count, int maximum) {
+        return randomSequence(random, count, maximum, 0);
+    }
+
+    private String randomSequence(Random random, int count, int maximum, int minimum) {
+        StringBuilder values = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            if (i > 0) values.append(' ');
+            values.append(minimum + random.nextInt(Math.max(1, maximum - minimum + 1)));
+        }
+        return values.toString();
     }
 
     private void clearCurrentForm() {
@@ -297,9 +357,23 @@ public class JavaApplication extends JFrame {
         if (controls != null) {
             for (JComponent control : controls)
                 if (control instanceof JTextComponent text) text.setText("");
+                else if (control instanceof JTable table)
+                    for (int row = 0; row < table.getRowCount(); row++)
+                        for (int column = 1; column < table.getColumnCount(); column++) table.setValueAt("", row, column);
         }
         stopSteps();
         resultOutput.setText("Inputs cleared. Enter values or click Autofill.");
+    }
+
+    private void fillTable(JTable table, String values) {
+        String[] rows = values.trim().split("\\R");
+        for (int row = 0; row < table.getRowCount(); row++)
+            for (int column = 1; column < table.getColumnCount(); column++) table.setValueAt("", row, column);
+        for (int row = 0; row < rows.length && row < table.getRowCount(); row++) {
+            String[] cells = rows[row].trim().split("[,\\s]+");
+            for (int column = 0; column < cells.length && column + 1 < table.getColumnCount(); column++)
+                table.setValueAt(cells[column], row, column + 1);
+        }
     }
     private AnimatedButton button(String text) {
         var b = new AnimatedButton(text);
@@ -386,6 +460,33 @@ public class JavaApplication extends JFrame {
     
     private int[] parseNumbers(String text) { return Arrays.stream(text.trim().split("[,\\s]+")).filter(s -> !s.isEmpty()).mapToInt(Integer::parseInt).toArray(); }
     private int[][] parseMatrix(String text) { return Arrays.stream(text.trim().split("\\n|;")).filter(s -> !s.trim().isEmpty()).map(this::parseNumbers).toArray(int[][]::new); }
+    private int[] parseNumbers(JComponent component) {
+        if (component instanceof JTable table) {
+            ArrayList<Integer> values = new ArrayList<>();
+            for (int row = 0; row < table.getRowCount(); row++)
+                for (int column = 1; column < table.getColumnCount(); column++) {
+                    Object value = table.getValueAt(row, column);
+                    if (value != null && !value.toString().trim().isEmpty()) values.add(Integer.parseInt(value.toString().trim()));
+                }
+            return values.stream().mapToInt(Integer::intValue).toArray();
+        }
+        return parseNumbers(((JTextComponent) component).getText());
+    }
+    private int[][] parseMatrix(JComponent component) {
+        if (component instanceof JTable table) {
+            ArrayList<int[]> rows = new ArrayList<>();
+            for (int row = 0; row < table.getRowCount(); row++) {
+                ArrayList<Integer> values = new ArrayList<>();
+                for (int column = 1; column < table.getColumnCount(); column++) {
+                    Object value = table.getValueAt(row, column);
+                    if (value != null && !value.toString().trim().isEmpty()) values.add(Integer.parseInt(value.toString().trim()));
+                }
+                if (!values.isEmpty()) rows.add(values.stream().mapToInt(Integer::intValue).toArray());
+            }
+            return rows.toArray(int[][]::new);
+        }
+        return parseMatrix(((JTextComponent) component).getText());
+    }
     private void showModule(int i) {
         stopSteps();
         activeModule = i;

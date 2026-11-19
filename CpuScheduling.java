@@ -67,14 +67,18 @@ public final class CpuScheduling {
         StringBuilder result = new StringBuilder("CPU SCHEDULING RESULT\n\n");
         result.append(calculation).append("\n");
         result.append("FORMULAS: turnaround = completion - arrival; waiting = turnaround - burst.\n\n");
-        result.append("Process  Arrival  Burst  Completion  Turnaround  Waiting\n");
+        result.append("+---------+---------+-------+------------+------------+---------+\n");
+        result.append("| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n");
+        result.append("+---------+---------+-------+------------+------------+---------+\n");
         double totalTurnaround = 0, totalWaiting = 0;
         for (int processIndex = 0; processIndex < processCount; processIndex++) {
             int turnaroundTime = completionTimes[processIndex] - arrivalTimes[processIndex];
             int waitingTime = turnaroundTime - burstTimes[processIndex];
             totalTurnaround += turnaroundTime; totalWaiting += waitingTime;
-            result.append(String.format("P%-7d %-8d %-6d %-11d %-11d %d%n", processIndex, arrivalTimes[processIndex], burstTimes[processIndex], completionTimes[processIndex], turnaroundTime, waitingTime));
+            result.append(String.format("| P%-6d | %-7d | %-5d | %-10d | %-10d | %-7d |%n",
+                processIndex, arrivalTimes[processIndex], burstTimes[processIndex], completionTimes[processIndex], turnaroundTime, waitingTime));
         }
+        result.append("+---------+---------+-------+------------+------------+---------+\n");
         return result.append(String.format("%nAverage turnaround time = %.2f%nAverage waiting time    = %.2f", totalTurnaround / processCount, totalWaiting / processCount)).toString();
     }
 }
