@@ -22,6 +22,16 @@ public final class DiskScheduling {
         }
         int totalMovement = 0; currentHeadPosition = initialHeadPosition;
         for (int cylinder : serviceOrder) { totalMovement += Math.abs(cylinder - currentHeadPosition); currentHeadPosition = cylinder; }
-        return "DISK SCHEDULING RESULT\n\nService order: " + initialHeadPosition + " -> " + serviceOrder.toString().replace("[", "").replace("]", "") + "\nTotal head movement = " + totalMovement + " cylinders";
+        StringBuilder result = new StringBuilder("DISK SCHEDULING RESULT\n\n");
+        result.append("CALCULATION WALKTHROUGH\n");
+        int previous = initialHeadPosition;
+        for (int cylinder : serviceOrder) {
+            result.append("Move ").append(Math.abs(cylinder - previous)).append(" cylinders: |").append(cylinder).append(" - ").append(previous).append("|.\n");
+            previous = cylinder;
+        }
+        result.append("\nService order: ").append(initialHeadPosition).append(" -> ")
+            .append(serviceOrder.toString().replace("[", "").replace("]", ""))
+            .append("\nTotal head movement = ").append(totalMovement).append(" cylinders");
+        return result.toString();
     }
 }

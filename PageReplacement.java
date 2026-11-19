@@ -7,7 +7,10 @@ public final class PageReplacement {
         int[] frames = new int[frameCount], lastUsedAt = new int[frameCount];
         Arrays.fill(frames, -1); Arrays.fill(lastUsedAt, -1);
         int fifoPointer = 0, hitCount = 0, faultCount = 0;
-        StringBuilder result = new StringBuilder("PAGE REPLACEMENT RESULT\n\nReference  Status  Frames\n");
+        StringBuilder result = new StringBuilder("PAGE REPLACEMENT RESULT\n\n");
+        result.append("CALCULATION WALKTHROUGH\n");
+        result.append("For each reference, search the frames first: present = HIT; absent = FAULT and replace according to the selected policy.\n\n");
+        result.append("Reference  Status  Frames\n");
         for (int referenceIndex = 0; referenceIndex < references.length; referenceIndex++) {
             int page = references[referenceIndex], replacementFrame = -1;
             for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) if (frames[frameIndex] == page) replacementFrame = frameIndex;
