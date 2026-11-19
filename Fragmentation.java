@@ -50,30 +50,36 @@ public final class Fragmentation {
             }
         }
 
-        StringBuilder result = new StringBuilder("FRAGMENTATION RESULT\n\n");
-        result.append("Allocation strategy: ").append(strategies[strategyChoice]).append("\n\nAllocations:\n");
+        StringBuilder result = new StringBuilder("FRAGMENTATION RESULT\n\nAllocation strategy: ").append(strategies[strategyChoice]).append("\n")
+            .append("@TABLE|PROCESS ALLOCATION|Process|Requested size|Block|Block size|Internal waste|Status\n");
+        StringBuilder calculations = new StringBuilder("\nCALCULATIONS\n");
         for (int processIndex = 0; processIndex < processSizes.length; processIndex++) {
             int blockIndex = allocatedBlocks[processIndex];
             if (blockIndex < 0) {
                 result.append("P").append(processIndex + 1).append(" (").append(processSizes[processIndex])
                     .append(") -> NOT ALLOCATED: ").append(failureReasons[processIndex]).append("\n");
+                result.append("@ROW|P").append(processIndex + 1).append('|').append(processSizes[processIndex]).append("|None|None|0|NOT ALLOCATED\n");
+                calculations.append("P").append(processIndex + 1).append(": ").append(failureReasons[processIndex]).append('\n');
             } else {
                 int waste = memoryBlocks[blockIndex] - processSizes[processIndex];
-                result.append("P").append(processIndex + 1).append(" (").append(processSizes[processIndex])
-                    .append(") -> Block ").append(blockIndex + 1).append(" (size ")
-                    .append(memoryBlocks[blockIndex]).append(", internal waste ").append(waste).append(")\n");
+                result.append("@ROW|P").append(processIndex + 1).append('|').append(processSizes[processIndex])
+                    .append("|Block ").append(blockIndex + 1).append('|').append(memoryBlocks[blockIndex]).append('|').append(waste).append("|ALLOCATED\n");
+                calculations.append("P").append(processIndex + 1).append(" internal waste = Block size - Process size -> ")
+                    .append(memoryBlocks[blockIndex]).append(" - ").append(processSizes[processIndex]).append(" = ").append(waste).append('\n');
             }
         }
 
-        result.append("\nRemaining free blocks:\n");
+        result.append("@ENDTABLE\n@TABLE|REMAINING FREE BLOCKS|Block|Available size\n");
         boolean hasFreeBlocks = false;
         for (int blockIndex = 0; blockIndex < memoryBlocks.length; blockIndex++) {
             if (!blockUsed[blockIndex]) {
-                result.append("Block ").append(blockIndex + 1).append(" (size ").append(memoryBlocks[blockIndex]).append(")\n");
+                result.append("@ROW|Block ").append(blockIndex + 1).append('|').append(memoryBlocks[blockIndex]).append('\n');
                 hasFreeBlocks = true;
             }
         }
-        if (!hasFreeBlocks) result.append("None\n");
+        if (!hasFreeBlocks) result.append("@ROW|None|0\n");
+        result.append("@ENDTABLE\n");
+        result.append(calculations);
         return result.append("\nTotal internal fragmentation = ").append(internalFragmentation)
             .append("\nProcesses not allocated = ").append(unallocatedCount).toString();
     }
