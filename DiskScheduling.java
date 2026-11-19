@@ -23,10 +23,11 @@ public final class DiskScheduling {
         int totalMovement = 0; currentHeadPosition = initialHeadPosition;
         for (int cylinder : serviceOrder) { totalMovement += Math.abs(cylinder - currentHeadPosition); currentHeadPosition = cylinder; }
         StringBuilder result = new StringBuilder("DISK SCHEDULING RESULT\n\n");
-        result.append("HEAD MOVEMENT CHECK\n");
+        result.append("DISK SCHEDULING CHECK\nSeek = |current - next|.\n");
         int previous = initialHeadPosition;
         for (int cylinder : serviceOrder) {
-            result.append("Move ").append(Math.abs(cylinder - previous)).append(" cylinders: |").append(cylinder).append(" - ").append(previous).append("|.\n");
+            result.append("Seek = |").append(cylinder).append(" - ").append(previous).append("| = ")
+                .append(Math.abs(cylinder - previous)).append(" cylinders.\n");
             previous = cylinder;
         }
         result.append("\nService order: ").append(initialHeadPosition).append(" -> ")

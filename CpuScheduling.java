@@ -15,7 +15,7 @@ public final class CpuScheduling {
         }
         int currentTime = 0, completedProcesses = 0;
         ArrayDeque<Integer> readyQueue = new ArrayDeque<>();
-        StringBuilder calculation = new StringBuilder("SCHEDULING CHECK\n");
+        StringBuilder calculation = new StringBuilder("CPU SCHEDULING CHECK\nInput: arrival time, burst time, and priority.\n");
         int stepNumber = 1;
         while (completedProcesses < processCount) {
             if (algorithmChoice == 4) {
@@ -66,7 +66,7 @@ public final class CpuScheduling {
         }
         StringBuilder result = new StringBuilder("CPU SCHEDULING RESULT\n\n");
         result.append(calculation).append("\n");
-        result.append("RESULT CHECK: turnaround = completion - arrival; waiting = turnaround - burst.\n\n");
+        result.append("RESULT CHECK: Turnaround = Completion - Arrival; Waiting = Turnaround - Burst.\n\n");
         result.append("+---------+---------+-------+------------+------------+---------+\n");
         result.append("| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n");
         result.append("+---------+---------+-------+------------+------------+---------+\n");
