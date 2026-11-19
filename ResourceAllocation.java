@@ -7,7 +7,7 @@ public final class ResourceAllocation {
         if (allocationMatrix.length != processCount || requestOrMaximumMatrix.length != processCount || availableResources.length != resourceCount) throw new Exception("Matrix dimensions do not match.");
         int[] remainingResources = availableResources.clone(); boolean[] processFinished = new boolean[processCount];
         ArrayList<Integer> sequence = new ArrayList<>(); boolean madeProgress = true;
-        StringBuilder calculation = new StringBuilder(safetyCheck ? "SAFETY CHECK\nInitial available = " : "DEADLOCK CHECK\nInitial available = ")
+        StringBuilder calculation = new StringBuilder(safetyCheck ? "BANKER'S SAFETY CHECK\nNeed = Max - Allocation.\nInitial Available = " : "DEADLOCK CHECK\nA process can finish when its Request fits in Available.\nInitial Available = ")
             .append(java.util.Arrays.toString(remainingResources)).append("\n");
         while (madeProgress) {
             madeProgress = false;
@@ -19,7 +19,8 @@ public final class ResourceAllocation {
                     requiredResources[resourceIndex] = required;
                     if (required > remainingResources[resourceIndex]) canFinish = false;
                 }
-                calculation.append("Check P").append(processIndex).append(": need ")
+                calculation.append("Check P").append(processIndex).append(": ")
+                    .append(safetyCheck ? "Need = Max - Allocation = " : "Request = ")
                     .append(java.util.Arrays.toString(requiredResources)).append(" <= available ")
                     .append(java.util.Arrays.toString(remainingResources)).append(" -> ")
                     .append(canFinish ? "can finish" : "wait").append("\n");
