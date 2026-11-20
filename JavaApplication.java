@@ -315,7 +315,7 @@ public class JavaApplication extends JFrame {
             else if (control instanceof JTable table && valueIndex < values.length)
                 fillTable(table, values[valueIndex++]);
         }
-        resultOutput.setText("Random values filled in. Adjust them if needed, then run the simulation.");
+        resultOutput.setText("Random values filled in. Adjust them if needed, then run.");
     }
 
     private String[] randomValues(int index) {
@@ -476,7 +476,7 @@ public class JavaApplication extends JFrame {
         Color border = darkMode ? Theme.DARK_BORDER : Theme.LIGHT_BORDER;
         Color text = darkMode ? Theme.DARK_TEXT : Theme.LIGHT_TEXT;
         outputPane.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(border), "Simulation result",
+            BorderFactory.createLineBorder(border), "Result",
             0, 0, new Font("SansSerif", Font.BOLD, 15), text));
         Theme.apply(root, darkMode);
         main.revalidate();
@@ -521,7 +521,7 @@ public class JavaApplication extends JFrame {
         moduleDescription.setText(MODULE_DESCRIPTIONS[i]);
         moduleCardLayout.show(moduleForms, "m" + i);
         applyTheme();
-        resultOutput.setText("Fill out the inputs and then run the simulation.");
+        resultOutput.setText("Fill out the inputs and then rum.");
     }
     private void showError(Exception e) { stopSteps(); resultOutput.setText("INPUT ERROR\n\n" + e.getMessage()); }
     
